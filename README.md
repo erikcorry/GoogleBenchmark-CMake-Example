@@ -1,7 +1,13 @@
-# GoogleBenchmark-CMake-Example
+# String benchmarks
 
-A working example of how to integrate the Google `benchmark` library with 
-`CMake` and `Visual Studio`.
+This is forked from GoogleBenchmark-CMake-Example
+
+It includes some string benchmarks.  The first one is a fast
+routine to get the UTF-8 length of a Latin1 string.  This is
+means basically counting the high bits (bytes more than 127)
+in a span.
+
+Below is the README from the benchmark suite.
 
 ## Background
 
