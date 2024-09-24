@@ -7,7 +7,7 @@ cmake_minimum_required (VERSION 3.11)
 include(../cmake/GoogleBenchmark.cmake)
 
 # Add source to this project's executable.
-add_executable (StringBenchmarks "StringBenchmarks.cpp" "StringBenchmarks.h")
+add_executable (StringBenchmarks "StringBenchmarks.cpp" "StringBenchmarks.h" "UtfCountBenchmarks.cpp")
 
 # Link Google Benchmark to the project
 target_link_libraries(StringBenchmarks benchmark::benchmark)
