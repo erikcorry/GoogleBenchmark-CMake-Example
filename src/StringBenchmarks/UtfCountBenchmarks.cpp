@@ -74,7 +74,7 @@ static uint8_t constexpr popcount_table[256] = {
 // though it knows that the input is only 16 bits it doesn't do
 // a table-based implementation, which is much faster than the
 // crazy bit fiddling it does.  If you compile with the right
-// -march option (eg -march=x86-64-v3 then it knows it can use
+// -march option (eg -march=x86-64-v3) then it knows it can use
 // the popcnt instruction, which is faster than the table.
 static inline int SixteenBitPopCount(uint16_t input) {
 #ifdef __POPCNT__
