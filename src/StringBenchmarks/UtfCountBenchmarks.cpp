@@ -2,11 +2,13 @@
 #include <cstdint>
 #include <span>
 
+#ifdef __x86_64__
 #include <emmintrin.h>  // SSE2.
+#endif
 
 #include <benchmark/benchmark.h>
 
-int foo(std::span<const uint8_t> span) {
+int naive_utf8_length(std::span<const uint8_t> span) {
   int utf8_length = 0;
   for (uint8_t c : span) {
     utf8_length += c >> 7;
@@ -17,25 +19,25 @@ int foo(std::span<const uint8_t> span) {
 const uint8_t lorem_ipsum_bytes[] = {
     'L', 'o', 'r', 'e', 'm', ' ', 'i', 'p', 's', 'u', 'm', ' ', 'd', 'o', 'l', 'o', 'r', ' ',
     's', 'i', 't', ' ', 'a', 'm', 'e', 't', ',', ' ', 'c', 'o', 'n', 's', 'e', 'c', 't', 'e',
-    't', 'u', 'r', ' ', 'a', 'd', 'i', 'p', 'i', 's', 'c', 'i', 'n', 'g', ' ', 'e', 'l', 'i',
+    't', 0xfc, 'r', ' ', 'a', 'd', 'i', 'p', 'i', 's', 'c', 'i', 'n', 'g', ' ', 'e', 'l', 'i',
     't', ',', ' ', 's', 'e', 'd', ' ', 'd', 'o', ' ', 'e', 'i', 'u', 's', 'm', 'o', 'd', ' ',
-    't', 'e', 'm', 'p', 'o', 'r', ' ', 'i', 'n', 'c', 'i', 'd', 'i', 'd', 'u', 'n', 't', ' ',
+    't', 'e', 'm', 'p', 0xf6, 'r', ' ', 'i', 'n', 'c', 'i', 'd', 'i', 'd', 'u', 'n', 't', ' ',
     'u', 't', ' ', 'l', 'a', 'b', 'o', 'r', 'e', ' ', 'e', 't', ' ', 'd', 'o', 'l', 'o', 'r',
     'e', ' ', 'm', 'a', 'g', 'n', 'a', ' ', 'a', 'l', 'i', 'q', 'u', 'a', '.'
 };
 
 std::span<const uint8_t> lorem_ipsum_span(lorem_ipsum_bytes, sizeof(lorem_ipsum_bytes));
 
-static void AutoVectorization(benchmark::State& state) {
+static void AutoVectorizedUtf8Length(benchmark::State& state) {
   // Code inside this loop is measured repeatedly
   for (auto _ : state) {
-    auto length = foo(lorem_ipsum_span);
+    auto length = naive_utf8_length(lorem_ipsum_span);
     // Make sure the variable is not optimized away by compiler
     benchmark::DoNotOptimize(length);
   }
 }
 // Register the function as a benchmark
-BENCHMARK(AutoVectorization);
+BENCHMARK(AutoVectorizedUtf8Length);
 
 #define B0 0, 1, 1, 2,
 #define B1 1, 2, 2, 3,
@@ -67,6 +69,7 @@ static inline int SixteenBitPopCount(unsigned input) {
 #endif
 }
 
+#ifdef __x86_64__
 int pure_sse2(std::span<const uint8_t> input) {
   // x64 always has SSE2, so we can assume that.
   int utf8_length = input.size();
@@ -99,3 +102,4 @@ static void PureSse2(benchmark::State& state) {
 }
 // Register the function as a benchmark
 BENCHMARK(PureSse2);
+#endif  // __x86_64__
