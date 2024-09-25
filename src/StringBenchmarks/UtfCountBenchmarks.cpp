@@ -1,3 +1,13 @@
+// The goal of these benchmarks is to take a Latin1 string and
+// calculate how many bytes the UTF-8 equivalent would be.  This
+// is a task that is used when exporting 1-byte strings from V8
+// to a UTF-8 destination.
+
+// The 0-127 code points turn into single-byte UTF-8 encodings,
+// and the 128-255 code points turn into two-byte UTF-8 encodings.
+// Therefore the task is basically to count the number of bytes
+// that are >= 128, ie have the high bit set.
+
 #include <cstddef>
 #include <cstdint>
 #include <span>
